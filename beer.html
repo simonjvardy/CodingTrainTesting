@@ -11,19 +11,19 @@
     <script>
         console.log('About to fetch a beer!');
 
-        // Call the fetch() function to GET the image resource
-        // the response back contains the "promise" to retrieve the data from teh fetch() call
-        fetch('assets/img/belgian-beer-belgian-pale-ale.jpg').then(response => {
-            console.log(response);
-
-            // return the response as a blob (image) - it could also be JSON or text data etc.
-            return response.blob();
-        }).then(blob => {
-            console.log(blob);
-
-            // Sends the blob data to the  <img> DOM element
-            // Note: we can't format blob data directly in the DOM so use URL.createObjectURL for the blob image path data
+        // Create an async function
+        // await = .then by awaiting the results of the fetch function which is added to the variable 'response'
+        // These 3 lines of code replace all the .thens from the previous version!
+        async function getSomeBeer() {
+            const response = await fetch('assets/img/belgian-beer-belgian-pale-ale.jpg');
+            const blob = await response.blob();
             document.getElementById('beer').src = URL.createObjectURL(blob);
+        }
+        
+        // now call the getSomeBeer function and add the .catch() to log any errors
+        getSomeBeer().catch(error => {
+            console.log('error!');
+            console.error(error);
         });
     </script>
 </body>
