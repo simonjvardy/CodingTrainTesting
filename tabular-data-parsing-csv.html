@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="Description" content="Enter your description here"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    
+    <!-- Chart.js CDN script -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+    <title>Fetch and Graph CSV</title>
+</head>
+<body>
+
+    <!-- canvas tags needed to render the Chart.js chart --> 
+    <canvas id="chart" width="800" height="400"></canvas>
+
+    <script>
+
+        // As we seems to be building the chart before getting the data, we've put the chart creation inside a function to be able to call it later
+        // as the getData() function is asynchonous, we need to make the chart function async too
+        async function chartIt() {
+
+            // Pull in the getData() function data for the chart
+            const data = await getData();
+            // Start of Chart.js code snippet
+            const ctx = document.getElementById('chart').getContext('2d');
+            
+            const myChart = new Chart(ctx, {
+                // change the type from bar to line graph
+                type: 'line',
+                data: {
+                    // year data pushed to the xAxis array will be used for the graph x-axis labels
+                    labels: data.xAxis,
+                    datasets: [{
+                        label: 'Combined Land-Surface Air and Sea-Surface Water Temperature in °C',
+                        // temperature data pushed to the yAxis array will be used for the graph y-axis labels
+                        data: data.yAxis,
+                        // removed colour arrays so that they applied to every bar, not just the first one!
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1,
+                        fill: false
+                    }]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                // set from true to false to make the scale start nearer to the data points, not zero
+                                beginAtZero: false,
+                                // include the degrees symbol in the ticks
+                                callback: function(value, index, values) {
+                                    return value + '°C';
+                                }
+                            }
+                        }]
+                    }
+                }
+            });
+        }
+        // End of Chart.js code snippet
+
+        // Data from: https://data.giss.nasa.gov/gistemp/
+        // Mean from: https://earthobservatory.nasa.gov/world-of-change/global-temperatures
+
+        async function getData(){
+
+            // set local variable for chart x & y axis data as arrays
+            const xAxis = [];
+            const yAxis = [];
+
+            const response = await fetch('assets/csv/ZonAnn.Ts+dSST.csv');
+            const data = await response.text();
+
+            // Firstly, split the csv data into rows using the split() method at the line break character
+            // next chain the slice() method at index 1 to remove the first row of data which is the column titles
+            const table = data.split(/\n/).slice(1);
+
+            // We actually only want the year and Global Average temperature columns for the graph
+            // we'll use a forEach() higher order function on rows variable to split every element of the array separated by a comma
+            table.forEach(row => {
+                const columns = row.split(',');
+
+                // extract the year from columns array index 0 and push the value to xlabels array in the chart
+                const year = columns[0];
+                xAxis.push(year);
+
+                // extract the temperature from columns array index 1
+                const temp = columns[1];
+                // We want to display the difference above and below the mean temp of 14
+                // Note: temp is a string value so need to parseFloat(temp) to be able to add 14 to it
+                yAxis.push(parseFloat(temp) + 14);
+
+                console.log(year, temp);
+            });
+            // Retuns an object with both x & y axis arrays
+            return { xAxis, yAxis };
+        }
+
+        chartIt();
+        
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+</body>
+</html>
