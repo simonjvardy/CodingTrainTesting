@@ -85,11 +85,11 @@
             table.forEach(row => {
                 const columns = row.split(',');
 
-                // extract the year from columns array index 0 and push the value to xlabels array in the chart
+                // extract the year from columns array index 0 and push the value to xAxis array to be used in the chart
                 const year = columns[0];
                 xAxis.push(year);
 
-                // extract the temperature from columns array index 1
+                // extract the temperature from columns array index 1 and push the value to yAxis array to be used in the chart
                 const temp = columns[1];
                 // We want to display the difference above and below the mean temp of 14
                 // Note: temp is a string value so need to parseFloat(temp) to be able to add 14 to it
