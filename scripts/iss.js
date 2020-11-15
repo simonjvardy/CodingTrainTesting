@@ -28,21 +28,12 @@ const iss_api_url_imperial = 'https://api.wheretheiss.at/v1/satellites/25544?uni
 
 async function getISSDataInMetricUnits() {
     const response = await fetch(iss_api_url_metric);
+
+    // create the data object containing the JSON response
     const data = await response.json();
 
-    // console.log() the data object properties
-    //console.log(data);
-    //console.log(data.name);
-    //console.log(data.latitude);
-    //console.log(data.longitude);
-    //console.log(data.altitude);
-
-    // even better, take the data object and place them into an object of separate variables and console.log() the variables
+    // even better, take the data object and place them into an object of separate variables
     const {name, latitude, longitude, altitude} = data;
-    //console.log(name);
-    //console.log(latitude);
-    //console.log(longitude);
-    //console.log(altitude);
 
     // Code adapted from https://leafletjs.com/reference-1.7.1.html#marker
     // Changes the marker position to the given point - in this case the latitude & longitude values
